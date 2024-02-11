@@ -5,38 +5,44 @@ using UnityEngine;
 
 public class Player : MonoBehaviour
 {
-    [SerializeField] private float speed = 3;
+    [SerializeField] private float speed = 10;
+    private bool isWalking;
+    [SerializeField] private InputReader input;
+    private Vector2 previousMovementInput;
+
+
+    private void OnEnable()
+    {
+        input.MoveAction += HandleMovement;
+    }
+
+    private void OnDisable()
+    {
+        input.MoveAction -= HandleMovement;
+    }
 
     private void Update()
     {
-        LegacyMovement();
+        Movement();
     }
 
-    private void LegacyMovement()
+
+    public bool IsWalking()
     {
-        Vector2 currentPos = new Vector2(0, 0);
+        return isWalking;
+    }
 
-        if (Input.GetKey(KeyCode.W))
-        {
-            currentPos.y = -1;
-        }
-
-        if (Input.GetKey(KeyCode.S))
-        {
-            currentPos.y = 1;
-        }
-
-        if (Input.GetKey(KeyCode.A))
-        {
-            currentPos.x = 1;
-
-        }
-        if (Input.GetKey(KeyCode.D))
-        {
-            currentPos.x = -1;
-        }
-        currentPos = currentPos.normalized;
-        var moveDir = new Vector3(currentPos.x, 0, currentPos.y);
+    private void Movement()
+    {
+        var moveDir = new Vector3(previousMovementInput.x, 0, previousMovementInput.y);
         transform.position += moveDir * speed * Time.deltaTime;
+        float speedRotate = 10f;
+        transform.forward = Vector3.Slerp(transform.forward, moveDir, speedRotate * Time.deltaTime);
+        isWalking = moveDir != Vector3.zero;
+    }
+
+    private void HandleMovement(Vector2 value)
+    {
+        previousMovementInput = -value;
     }
 }
