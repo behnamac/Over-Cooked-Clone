@@ -2,65 +2,39 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ClearCounter : MonoBehaviour, IKitchenObjectParents
+public class ClearCounter : BaseCounter
 {
     [SerializeField] private KitchenObjectSO ingridientPrefab;
-    [SerializeField] private Transform topCounterSpawnPoint;
-    private KitchenObject currentKitchenObject;
-
-    //Tesing
-    [SerializeField] private ClearCounter secondClearCounter;
-    [SerializeField] private bool testing;
 
 
-    private void Update()
+
+    public override void Interact(Player player)
     {
-        if (testing && Input.GetKeyDown(KeyCode.T))
+        if (!HasKitchenObject())
         {
-            if (currentKitchenObject != null)
+            if (player.HasKitchenObject())
             {
-                currentKitchenObject.SetKitchenObjectParents(secondClearCounter);
+                player.GetKitchenObject().SetKitchenObjectParents(this);
             }
-        }
-    }
-
-    public void Interact(Player player)
-    {
-        if (currentKitchenObject == null)
-        {
-            var ingridien = Instantiate(ingridientPrefab.Prefab, topCounterSpawnPoint);
-            ingridien.GetComponent<KitchenObject>().SetKitchenObjectParents(this);           
+            else
+            {
+                // Player has nothing;
+            }
         }
         else
         {
-         //   currentKitchenObject.SetKitchenObjectParents(player);
+            if (player.HasKitchenObject())
+            {
+                //Player carrying somthing so it can not put in because the countainer is full
+            }
+            else
+            {
+                GetKitchenObject().SetKitchenObjectParents(player);
+            }
 
         }
     }
 
-    public Transform GetKitchenObjectFollowTransform()
-    {
-        return topCounterSpawnPoint;
-    }
 
-    public void SetKitchenObject(KitchenObject kitchenObject)
-    {
-        this.currentKitchenObject = kitchenObject;
-    }
 
-    public KitchenObject GetKitchenObjecy()
-    {
-        return currentKitchenObject;
-    }
-
-    public void ClearKitchenObject()
-    {
-        currentKitchenObject = null;
-    }
-
-    public bool HasKitchenObject()
-    {
-        return currentKitchenObject != null;
-    }
-   
 }
